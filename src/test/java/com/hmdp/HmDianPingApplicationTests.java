@@ -3,6 +3,7 @@ package com.hmdp;
 import com.hmdp.entity.Shop;
 import com.hmdp.mapper.ShopMapper;
 import com.hmdp.service.impl.ShopServiceImpl;
+import com.hmdp.utils.PasswordEncoder;
 import com.hmdp.utils.RedisConstants;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -73,5 +74,14 @@ class HmDianPingApplicationTests {
         assertNotNull(finalShop, "重建后查询不应为空");
 
         System.out.println("测试成功！完整地验证了逻辑过期的全过程。");
-}
     }
+
+    @Test
+    void passwordEncoderWorks() {
+        String raw = "secret";
+        String encoded = PasswordEncoder.encode(raw);
+        assertNotNull(encoded, "编码结果不应为空");
+        org.junit.jupiter.api.Assertions.assertTrue(PasswordEncoder.matches(encoded, raw));
+        org.junit.jupiter.api.Assertions.assertFalse(PasswordEncoder.matches(encoded, "other"));
+    }
+}

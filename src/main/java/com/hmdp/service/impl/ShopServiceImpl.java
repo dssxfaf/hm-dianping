@@ -94,9 +94,9 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         //6.缓存重建
         //6.1 获取互斥锁
         String lockKey = LOCK_SHOP_KEY + id;
-        boolean islock = trylock(lockKey);
+        boolean isLock = tryLock(lockKey);
         //6.2 判断是否获取锁成功
-        if(islock){
+        if(isLock){
             //6.3 成功，开启独立线程，实现缓存重建
             CACHE_REBUILD_EXECUTOR.submit(() -> {
                 this.saveShop2Redis(id,30L);
@@ -123,9 +123,9 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         //3.实现缓存重建
         //3.1 获取互斥锁
         String lockKey = "lock:shop:" + id;
-        boolean islock = trylock(lockKey);
+        boolean isLock = tryLock(lockKey);
         //3.2 判断是否成功
-        if(!islock){
+        if(!isLock){
             //3.3 失败，则休眠并重试
             Thread.sleep(50);
             return queryWithMutex(id);
@@ -181,7 +181,7 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         return shop;
     }
 
-    private boolean trylock(String key){
+    private boolean tryLock(String key){
         Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(key, "1", 10, TimeUnit.SECONDS);
         return BooleanUtil.isTrue(flag);
     }
